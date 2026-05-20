@@ -1,0 +1,29 @@
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+gen/
+.classpath
+.project
+.settings/
+
+# Arquivos Executáveis e Binários
+*.class
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.app
+*.jar
+*.war
+*.ear
+
+
+# Logs e Temporários
+*.log
+*.swp
+.DS_Store
+Thumbs.db
