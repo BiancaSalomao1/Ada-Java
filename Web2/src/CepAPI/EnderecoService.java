@@ -1,5 +1,7 @@
 package CepAPI;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -8,12 +10,14 @@ import java.net.http.HttpResponse;
 
 public class EnderecoService {
 
-    private static final String API_URL =
-            "https://viacep.com.br/ws/%s/json/";
+    private static final String API_URL = "https://viacep.com.br/ws/%s/json/";
+
+    // Instância única do Jackson para converter JSON em Objeto
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Endereco consultarCep(String cep) {
-
-        String url = String.format(API_URL, cep);
+        String cepLimpo = cep.replaceAll("\\D", "");
+        String url = String.format(API_URL, cepLimpo);
 
         HttpClient client = HttpClient.newHttpClient();
 
@@ -23,56 +27,24 @@ public class EnderecoService {
                 .build();
 
         try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            HttpResponse<String> response =
-                    client.send(
-                            request,
-                            HttpResponse.BodyHandlers.ofString()
-                    );
-
+            System.out.println("Status Code: " + response.statusCode());
             String json = response.body();
 
-            String cepJson = extrairValor(json, "cep");
-            String logradouro = extrairValor(json, "logradouro");
-            String bairro = extrairValor(json, "bairro");
-            String localidade = extrairValor(json, "localidade");
-            String uf = extrairValor(json, "uf");
+            // ViaCEP retorna HTTP 200 mesmo quando o CEP não existe, mas envia um JSON com erro=true
+            if (json.contains("\"erro\":")) {
+                throw new IllegalArgumentException("CEP não encontrado na base de dados do ViaCEP.");
+            }
 
-            return new Endereco(
-                    cepJson,
-                    logradouro,
-                    bairro,
-                    localidade,
-                    uf
-            );
+            return objectMapper.readValue(json, Endereco.class);
 
         } catch (IOException | InterruptedException e) {
-
-            e.printStackTrace();
+            System.err.println("Erro ao consultar o CEP: " + e.getMessage());
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
             return null;
         }
-    }
-
-    private static String extrairValor(String json, String chave) {
-
-        String busca = "\"" + chave + "\":";
-
-        int inicio = json.indexOf(busca);
-
-        if (inicio == -1) {
-            return "";
-        }
-
-        inicio += busca.length();
-
-        while (json.charAt(inicio) == ' ' ||
-                json.charAt(inicio) == '\"') {
-
-            inicio++;
-        }
-
-        int fim = json.indexOf("\"", inicio);
-
-        return json.substring(inicio, fim);
     }
 }
