@@ -1,29 +1,85 @@
+# =========================
 # IntelliJ IDEA
+# =========================
 .idea/
 *.iws
 *.iml
 *.ipr
 out/
-gen/
+
+# =========================
+# VSCode
+# =========================
+.vscode/
+
+# =========================
+# Eclipse / STS
+# =========================
 .classpath
 .project
 .settings/
+.springBeans
+.sts4-cache/
 
-# Arquivos Executáveis e Binários
+# =========================
+# Maven
+# =========================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+# Maven Wrapper
+.mvn/timing.properties
+
+# =========================
+# Java
+# =========================
 *.class
-*.exe
-*.dll
-*.so
-*.dylib
-*.out
-*.app
-*.jar
-*.war
-*.ear
 
-
-# Logs e Temporários
+# =========================
+# Logs
+# =========================
+logs/
 *.log
+spring.log
+
+# =========================
+# Arquivos locais de ambiente
+# =========================
+.env
+.env.*
+application-local.properties
+application-local.yml
+application-dev.properties
+application-dev.yml
+
+# =========================
+# Lombok
+# =========================
+delombok/
+
+# =========================
+# Coverage/Testes
+# =========================
+coverage/
+jacoco.exec
+
+# =========================
+# Arquivos temporários
+# =========================
 *.swp
+*.swo
+*~
+tmp/
+temp/
+
+# =========================
+# Sistema Operacional
+# =========================
 .DS_Store
 Thumbs.db
