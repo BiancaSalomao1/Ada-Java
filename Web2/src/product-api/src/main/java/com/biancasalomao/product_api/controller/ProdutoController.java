@@ -20,7 +20,6 @@ public class ProdutoController {
 
     @GetMapping
     public ResponseEntity<List<Produto>> getProdutos() {
-
         return ResponseEntity.ok(produtoService.getProdutos());
     }
 
@@ -36,22 +35,32 @@ public class ProdutoController {
         return ResponseEntity.ok(produto);
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Produto> criarProduto(@RequestBody Produto produto) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        Produto novoProduto = produtoService.criarProduto(produto);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(novoProduto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Produto> atualizarProduto(@PathVariable Long id, @RequestBody Produto produto) {
-        produto.setId(id);
-        return ResponseEntity.ok(produto);
+    public ResponseEntity<Produto> atualizarProduto(
+            @PathVariable Long id,
+            @RequestBody Produto produto
+    ) {
+
+        Produto produtoAtualizado = produtoService.atualizarProduto(id, produto);
+
+        return ResponseEntity.ok(produtoAtualizado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {
 
+        produtoService.deletarProduto(id);
+
         return ResponseEntity.noContent().build();
     }
-
 }
