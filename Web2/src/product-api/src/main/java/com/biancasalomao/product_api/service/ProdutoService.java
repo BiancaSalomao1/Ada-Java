@@ -1,37 +1,28 @@
 package com.biancasalomao.product_api.service;
 
 import com.biancasalomao.product_api.model.Produto;
+import com.biancasalomao.product_api.repository.ProdutoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ProdutoService {
 
-    private final List<Produto> produtos = new ArrayList<>(
-            List.of(
-                    new Produto(1L, "Produto 1", 10.0),
-                    new Produto(2L, "Produto 2", 20.0),
-                    new Produto(3L, "Produto 3", 30.0)
-            )
-    );
 
-    private List<Produto> produtoList() {
-        return produtos;
-    }
+    @Autowired
+    private ProdutoRepository produtoRepository;
+
 
     public List<Produto> getProdutos() {
-        return produtoList();
+        return produtoRepository.findAll();
     }
 
     public Produto buscarPorId(Long id) {
-
-        return produtoList().stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
+        return produtoRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(
                                 HttpStatus.NOT_FOUND,
@@ -40,23 +31,15 @@ public class ProdutoService {
     }
 
     public Produto criarProduto(Produto produto) {
-
-        produtoList().add(produto);
-
-        return produto;
+        return produtoRepository.save(produto);
     }
 
     public Produto atualizarProduto(Long id, Produto produtoAtualizado) {
-
-        return produtoList().stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
+        return produtoRepository.findById(id)
                 .map(produtoExistente -> {
-
                     produtoExistente.setNome(produtoAtualizado.getNome());
                     produtoExistente.setPreco(produtoAtualizado.getPreco());
-
-                    return produtoExistente;
+                    return produtoRepository.save(produtoExistente); // Salva a alteração
                 })
                 .orElseThrow(() ->
                         new ResponseStatusException(
@@ -65,10 +48,35 @@ public class ProdutoService {
                         ));
     }
 
+    public Produto atualizarParcialProduto(Long id, Produto produtoParcial) {
+
+        Produto produtoExistente = produtoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Produto não encontrado"
+                ));
+
+
+        if (produtoParcial.getNome() != null) {
+            produtoExistente.setNome(produtoParcial.getNome());
+        }
+
+        if (produtoParcial.getPreco() != 0.0) {
+            produtoExistente.setPreco(produtoParcial.getPreco());
+        }
+
+
+        return produtoRepository.save(produtoExistente);
+    }
+
+
     public void deletarProduto(Long id) {
-
-        Produto produto = buscarPorId(id);
-
-        produtoList().remove(produto);
+        if (!produtoRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Produto não encontrado"
+            );
+        }
+        produtoRepository.deleteById(id);
     }
 }

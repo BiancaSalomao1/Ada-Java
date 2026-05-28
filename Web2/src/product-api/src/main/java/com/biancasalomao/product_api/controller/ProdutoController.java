@@ -55,6 +55,16 @@ public class ProdutoController {
 
         return ResponseEntity.ok(produtoAtualizado);
     }
+    @PatchMapping("/{id}")
+    public ResponseEntity<Produto> atualizarParcialProduto(
+            @PathVariable Long id,
+            @RequestBody Produto produto
+    ) {
+
+        Produto produtoAtualizado = produtoService.atualizarParcialProduto(id, produto);
+
+        return ResponseEntity.ok(produtoAtualizado);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {
